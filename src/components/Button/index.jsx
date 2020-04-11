@@ -4,6 +4,14 @@ import './styles.css'
 export default props => {
 
   return (
-    <button className="button">{props.label || "null"}</button>
+    <button 
+      onClick={e => props.click && props.click(props.label)}
+      className={`
+        button
+        ${props.operation? 'operation' : ''}
+        ${props.double? 'double' : ''}
+      `}>
+      {props.label || "null"}
+    </button>
   )
 }
