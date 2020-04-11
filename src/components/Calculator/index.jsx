@@ -3,12 +3,15 @@ import { FaPercent, FaDivide, FaTimes, FaMinus, FaPlus, FaEquals } from 'react-i
 import './styles.css'
 
 import Button from '../Button'
+import Display from '../Display'
 
 export default class Calculator extends Component {
   render() {
     return (
       <div className="calculator">
+        <Display value="100"/>
         <Button label="AC"/>
+        <Button label=" "/>
         <Button label={ <FaPercent size={14} /> }/>
         <Button label={ <FaDivide size={18} /> }/>
         <Button label="7"/>
@@ -25,11 +28,8 @@ export default class Calculator extends Component {
         <Button label={ <FaPlus size={18} /> }/>
         <Button label="0"/>        
         <Button label="."/>
+        <Button label="000"/>
         <Button label={ <FaEquals size={18} /> }/>
-
-        <Button />
-
-
       </div>
     )
   }
