@@ -8,6 +8,7 @@ ReactDOM.render(
   <React.StrictMode>
     <h1>Calculadora</h1>
     <Calculator />
+    <p>by Philipe Vieira</p>
   </React.StrictMode>,
   document.getElementById('root')
 );

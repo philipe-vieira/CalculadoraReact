@@ -8,7 +8,7 @@ import Display from '../Display'
 const initialState ={
   displayValue: '0',
   clearDisplay: false,
-  operations: [],
+  operation: null,
   values: [0, 0],
   current: 0
 }
@@ -29,8 +29,137 @@ export default class Calculator extends Component {
   }
 
   setOperations(operation){
-    console.log(operation)
-    console.log(operation.type.name)
+    // console.log(this.state)
+
+    const clearDisplay = true
+    const operationState = this.state.operation;
+    const valuesState = this.state.values;
+    const current= 1 + this.state.current
+    
+    function execOperation(values = valuesState, op = operationState){   
+      switch(op){
+        case '+':
+          values[0] = values[0] + values[1]
+          values[1] = 0
+          break;
+        case '-':
+          values[0] = values[0] - values[1]
+          values[1] = 0
+          break;
+        case '*':
+          values[0] = values[0] * values[1]
+          values[1] = 0
+          break;
+        case '/':
+          values[0] = values[0] / values[1]
+          values[1] = 0
+          break;
+        default:
+          break;
+      }
+      return values
+    }
+    
+
+    switch(operation.type.name){
+      case 'FaPercent':
+        if(current === 1 ){
+          const valuesReturned = execOperation([this.state.values[0], 100], '/')
+          this.setState({ 
+            displayValue: this.state.displayValue + '%', 
+            current: current - 1,
+            values: valuesReturned
+          })
+        } else if(this.state.values[1] !== 0){
+          let valuesReturned = this.state.values[0]
+
+          if(this.state.operation === '-' || this.state.operation === '+'){
+            valuesReturned = execOperation([execOperation([this.state.values[1], 100], '/')[0],this.state.values[0]], '*')
+          } else {
+            valuesReturned = execOperation([this.state.values[1], 100], '/')
+          }
+          
+          this.setState({ 
+            displayValue: this.state.displayValue + '%', 
+            current: current - 1,
+            values: [this.state.values[0], valuesReturned[0]]
+          })
+        }
+        break;
+      case 'FaDivide':
+        if( current === 1){
+          this.setState({ operation: '/', current })
+        } else {
+          if(this.state.operation){
+            const valuesReturned = execOperation()
+            this.setState({ 
+              displayValue: valuesReturned[0],
+              operation: '/', 
+              current: current - 1,
+              values: valuesReturned
+            })
+          }
+        }
+        break;
+      case 'FaTimes':
+        if( current === 1){
+          this.setState({ operation: '*', current })
+        } else {
+          if(this.state.operation){
+            const valuesReturned = execOperation()
+            this.setState({ 
+              displayValue: valuesReturned[0],
+              operation: '*', 
+              current: current - 1,
+              values: valuesReturned
+            })
+          }
+        }
+        break;
+      case 'FaMinus':
+        if( current === 1){
+          this.setState({ operation: '-',  current })
+        } else {
+          if(this.state.operation){
+            const valuesReturned = execOperation()
+            this.setState({ 
+              displayValue: valuesReturned[0],
+              operation: '-', 
+              current: current - 1,
+              values: valuesReturned
+            })
+          }
+        }
+        break;
+      case 'FaPlus':
+        if( current === 1){
+          this.setState({ operation: '+', current })
+        } else {
+          if(this.state.operation){
+            const valuesReturned = execOperation()
+            this.setState({ 
+              displayValue: valuesReturned[0],
+              operation: '+', 
+              current: current - 1,
+              values: valuesReturned
+            })
+          }
+        }
+        break;
+      case 'FaEquals':
+        const valuesReturned = execOperation()
+        this.setState({ 
+          displayValue: valuesReturned[0],
+          operation: null, 
+          current: 0,
+          values: valuesReturned
+        })
+        break;
+      default:
+        break;
+    }
+
+    this.setState({ clearDisplay })
   }
 
   addDigits(digit){
@@ -48,11 +177,11 @@ export default class Calculator extends Component {
       const values = [...this.state.values]
       values[indice] = value
       this.setState({ values })
+      // console.log(values)
     }
   }
 
-  render() {
-    
+  render() { 
     return (
       <div className="calculator">
         <Display value={this.state.displayValue}/>
