@@ -1,14 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import Calculator from './components/Calculator';
+import App from './App';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
   <React.StrictMode>
-    <h1>Calculadora</h1>
-    <Calculator />
-    <p>by Philipe Vieira</p>
+    <App />
   </React.StrictMode>,
   document.getElementById('root')
 );

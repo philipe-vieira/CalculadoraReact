@@ -29,12 +29,11 @@ export default class Calculator extends Component {
   }
 
   setOperations(operation){
-    // console.log(this.state)
+    console.log(this.state)
 
     const clearDisplay = true
-    const operationState = this.state.operation;
-    const valuesState = this.state.values;
     const current= 1 + this.state.current
+    const { operation: operationState, values: valuesState } = this.state
     
     function execOperation(values = valuesState, op = operationState){   
       switch(op){
@@ -160,6 +159,7 @@ export default class Calculator extends Component {
     }
 
     this.setState({ clearDisplay })
+    console.log(this.state)
   }
 
   addDigits(digit){

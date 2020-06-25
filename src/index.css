@@ -7,9 +7,11 @@
   font-family: 'RobotoMono', sans-serif;
 }
 
-body{
+body {
+  margin: 0;
+  padding: 0;
   display: flex;
-  height: 97.5vh;
+  height: 100vh;
   justify-content: center;
   align-items: center;
 
@@ -24,4 +26,9 @@ body{
 p {
   font-family: fantasy;
   font-size: 12px;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
 }
