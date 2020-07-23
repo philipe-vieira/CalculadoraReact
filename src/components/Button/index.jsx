@@ -1,17 +1,17 @@
-import React from "react";
+import React from 'react'
 import './styles.css'
 
-export default props => {
-
+export default (props) => {
   return (
-    <button 
-      onClick={e => props.click && props.click(props.label)}
+    <button
+      onClick={(e) => props.click && props.click(props.label)}
       className={`
         button
-        ${props.operation? 'operation' : ''}
-        ${props.double? 'double' : ''}
-      `}>
-      {props.label || "null"}
+        ${props.operation ? 'operation' : ''}
+        ${props.double ? 'double' : ''}
+      `}
+    >
+      {props.children || props.label || 'null'}
     </button>
   )
 }

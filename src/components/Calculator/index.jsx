@@ -1,287 +1,241 @@
-import React, { Component } from "react";
-import { FaPercent, FaDivide, FaTimes, FaMinus, FaPlus, FaEquals } from 'react-icons/fa';
+import React, { Component } from 'react'
+import {
+  FaPercent,
+  FaDivide,
+  FaTimes,
+  FaMinus,
+  FaPlus,
+  FaEquals,
+} from 'react-icons/fa'
 import './styles.css'
 
 import Button from '../Button'
 import Display from '../Display'
 
-const initialState ={
+const initialState = {
+  // Numero mostrado na tela da calculadora
   displayValue: '0',
+  // Armazena informação se limpa a tela nas operações
   clearDisplay: false,
+  // Armazena a operação atual
   operation: null,
+  // Armazena os valores da operação
   values: [0, 0],
-  current: 0
+  // Armazena o índice do array que esta sendo trabalhado
+  current: 0,
 }
 
 export default class Calculator extends Component {
+  state = { ...initialState }
 
-  state={...initialState}
-
-  constructor(props){
+  constructor(props) {
     super(props)
     this.clearMemory = this.clearMemory.bind(this)
     this.setOperations = this.setOperations.bind(this)
     this.addDigits = this.addDigits.bind(this)
   }
 
-  clearMemory(){
-    this.setState({...initialState})
+  clearMemory() {
+    this.setState({ ...initialState })
   }
 
-  setOperations(operation){
-    console.log(this.state)
+  setOperations(operation) {
+    const {
+      operation: operationState,
+      values: valuesState,
+      current: currentState,
+    } = this.state
 
-    const clearDisplay = true
-    const current= 1 + this.state.current
-    const { operation: operationState, values: valuesState } = this.state
-    
-    function execOperation(values = valuesState, op = operationState){   
-      switch(op){
-        case '+':
-          values[0] = values[0] + values[1]
-          values[1] = 0
-          break;
-        case '-':
-          values[0] = values[0] - values[1]
-          values[1] = 0
-          break;
-        case '*':
-          values[0] = values[0] * values[1]
-          values[1] = 0
-          break;
-        case '/':
-          values[0] = values[0] / values[1]
-          values[1] = 0
-          break;
-        default:
-          break;
-      }
-      return values
+    const operationCalc = {
+      null: () => {
+        return ''
+      },
+      operation: () => {
+        if (
+          // Se o usuário já digitou uma operação
+          operationState &&
+          // Se o usuário já digitou o segundo valor
+          valuesState[1] !== 0
+        ) {
+          // Calcula o resultado da primeira operação e prepara para a próxima
+          // Guarda o resultado da primeira operação na primeira posição do Array
+          const valueResult = operationCalc['=']()
+          return {
+            displayValue: valueResult,
+            operation,
+            current: 1,
+            clearDisplay: true,
+            values: [valueResult, 0],
+          }
+        }
+        return { operation, current: 1, clearDisplay: true }
+      },
+      '/': (values = [0, 0]) => {
+        // Recupera o array em float
+        values = values.map((value) => parseFloat(value))
+        // Executa a operação de soma
+        return values[0] / values[1]
+      },
+      '*': (values = [0, 0]) => {
+        // Recupera o array em float
+        values = values.map((value) => parseFloat(value))
+        // Executa a operação de soma
+        return values[0] * values[1]
+      },
+      '-': (values = [0, 0]) => {
+        // Recupera o array em float
+        values = values.map((value) => parseFloat(value))
+        // Executa a operação de soma
+        return values[0] - values[1]
+      },
+      '+': (values = [0, 0]) => {
+        // Recupera o array em float
+        values = values.map((value) => parseFloat(value))
+        // Executa a operação de soma
+        return values[0] + values[1]
+      },
+      '%': (values = [0, 0]) => {
+        if (
+          (valuesState[0] + '').includes('%') &&
+          (valuesState[1] + '').includes('%')
+        ) {
+          // Se os dois items do cálculo forem percentuais
+          // Divide-se ambos por 100 e realiza a operação
+          values = values.map((value) => parseFloat(value))
+          const arrayItems = [values[0] / 100, values[1] / 100]
+          return operationCalc[operationState](arrayItems)
+        } else if (
+          (operationState === '+' || operationState === '-') &&
+          (values[1] + '').includes('%')
+        ) {
+          // Se a operação for soma ou adição
+          // E o percentual estiver na segunda posição do array
+          // Calcula-se a porcentagem em relação ao primeiro item e realiza a operação (adição ou subtração)
+          values = values.map((value) => parseFloat(value))
+          const percent = values[0] * (values[1] / 100)
+          return operationCalc[operationState]([values[0], percent])
+        } else if ((values[1] + '').includes('%')) {
+          // Se não for adição ou subtração, mas a posição 1 do array contiver o percentual
+          // Isso indica que a operação é multiplicação ou divisão
+          // Calcula-se o percentual em decimais e realiza a operação (multiplicação ou divisão)
+          values = values.map((value) => parseFloat(value))
+          return operationCalc[operationState]([values[0], values[1] / 100])
+        }
+        // Senão... o percentual está no primeiro item
+        // independente da operação Calcula-se o percentual em decimais e realiza a operação
+        values = values.map((value) => parseFloat(value))
+        return operationCalc[operationState]([values[0] / 100, values[1]])
+      },
+      '=': () => {
+        if (
+          (valuesState[0] + '').includes('%') ||
+          (valuesState[1] + '').includes('%')
+        ) {
+          // Calcula com porcentagem
+          return operationCalc['%'](valuesState)
+        } else if (operationState) {
+          return operationCalc[operationState](valuesState)
+        }
+      },
     }
-    
 
-    switch(operation.type.name){
-      case 'FaPercent':
-        if(current === 1 ){
-          const valuesReturned = execOperation([this.state.values[0], 100], '/')
-          this.setState({ 
-            displayValue: this.state.displayValue + '%', 
-            current: current - 1,
-            values: valuesReturned
-          })
-        } else if(this.state.values[1] !== 0){
-          let valuesReturned = this.state.values[0]
-
-          if(this.state.operation === '-' || this.state.operation === '+'){
-            valuesReturned = execOperation([execOperation([this.state.values[1], 100], '/')[0],this.state.values[0]], '*')
-          } else {
-            valuesReturned = execOperation([this.state.values[1], 100], '/')
-          }
-          
-          this.setState({ 
-            displayValue: this.state.displayValue + '%', 
-            current: current - 1,
-            values: [this.state.values[0], valuesReturned[0]]
-          })
-        }
-        break;
-      case 'FaDivide':
-        if( current === 1){
-          this.setState({ operation: '/', current })
-        } else {
-          if(this.state.operation){
-            const valuesReturned = execOperation()
-            this.setState({ 
-              displayValue: valuesReturned[0],
-              operation: '/', 
-              current: current - 1,
-              values: valuesReturned
-            })
-          }
-        }
-        break;
-      case 'FaTimes':
-        if( current === 1){
-          this.setState({ operation: '*', current })
-        } else {
-          if(this.state.operation){
-            const valuesReturned = execOperation()
-            this.setState({ 
-              displayValue: valuesReturned[0],
-              operation: '*', 
-              current: current - 1,
-              values: valuesReturned
-            })
-          }
-        }
-        break;
-      case 'FaMinus':
-        if( current === 1){
-          this.setState({ operation: '-',  current })
-        } else {
-          if(this.state.operation){
-            const valuesReturned = execOperation()
-            this.setState({ 
-              displayValue: valuesReturned[0],
-              operation: '-', 
-              current: current - 1,
-              values: valuesReturned
-            })
-          }
-        }
-        break;
-      case 'FaPlus':
-        if( current === 1){
-          this.setState({ operation: '+', current })
-        } else {
-          if(this.state.operation){
-            const valuesReturned = execOperation()
-            this.setState({ 
-              displayValue: valuesReturned[0],
-              operation: '+', 
-              current: current - 1,
-              values: valuesReturned
-            })
-          }
-        }
-        break;
-      case 'FaEquals':
-        const valuesReturned = execOperation()
-        this.setState({ 
-          displayValue: valuesReturned[0],
-          operation: null, 
-          current: 0,
-          values: valuesReturned
+    if (
+      (currentState === 0 || (currentState === 1 && valuesState[1] === 0)) &&
+      operation !== '='
+    ) {
+      this.setState({ operation, current: 1, clearDisplay: true })
+      return
+    } else {
+      if (operation === '=') {
+        // Recebe o valor resultado da operação
+        const valueResult = operationCalc['=']()
+        this.setState({
+          ...initialState,
+          clearDisplay: true,
+          displayValue: valueResult,
+          values: [valueResult, 0],
         })
-        break;
-      default:
-        break;
+        return
+      }
+      // Recebe o resultado da operação num objeto de state e salva no estado
+      const stateObject = operationCalc['operation']()
+      this.setState(stateObject)
     }
-
-    this.setState({ clearDisplay })
-    console.log(this.state)
   }
 
-  addDigits(digit){
-    if( digit === '.' && this.state.displayValue.includes('.') ) return
+  addDigits(digit) {
+    // Se o usuário digitar um ponto e já existir um ponto na STRING displayValue
+    // OU se já existir porcentagem no displayValue
+    // A função encerra com o return, e não permite adicionar outro ponto ou digito
+    if (
+      (digit === '.' && (this.state.displayValue + '').includes('.')) ||
+      ((this.state.displayValue + '').includes('%') &&
+        this.state.clearDisplay === false)
+    )
+      return
 
-    const clearDisplay = this.state.displayValue === '0' || this.state.clearDisplay
-    const currentValue = clearDisplay ? '' : this.state.displayValue 
-    const displayValue = currentValue === '' && digit === '.' ? '0.' : currentValue + digit
+    // Se valor precisar ser limpo
+    // ou seja, se for 0 ou o clear display estiver ativo
+    // O valor atual é vazio, senão o novo digito é acrescentado
+    const currentValue =
+      this.state.displayValue === '0' || this.state.clearDisplay
+        ? ''
+        : this.state.displayValue
+    // Se o primeiro digito for '.' adiciona '0.'
+    // Senão acrescenta o digito incluído
+    const displayValue =
+      currentValue === '' && digit === '.' ? '0.' : currentValue + digit
 
-    this.setState({ displayValue, clearDisplay: false})
+    this.setState({ displayValue, clearDisplay: false })
 
-    if (digit !== '.' ){
-      const indice = this.state.current
-      const value = parseFloat(displayValue)
+    if (digit !== '.') {
+      // Sempre que um digito decimal for digitado
+      // Adiciona ao array na posição atual
       const values = [...this.state.values]
-      values[indice] = value
+      values[this.state.current] = displayValue
       this.setState({ values })
-      // console.log(values)
     }
   }
 
-  render() { 
+  render() {
     return (
       <div className="calculator">
-        <Display value={this.state.displayValue}/>
-
-        <Button 
-          label="AC" double={true}
-          click={this.clearMemory }
-        />
-
+        <Display value={this.state.displayValue} />
+        <Button label="AC" double={true} click={this.clearMemory} />
+        <Button label="%" click={this.addDigits}>
+          <FaPercent size={14} />
+        </Button>
+        <Button label="/" click={this.setOperations} operation={true}>
+          <FaDivide size={18} />
+        </Button>
+        <Button label="7" click={this.addDigits} />
+        <Button label="8" click={this.addDigits} />
+        <Button label="9" click={this.addDigits} />
+        <Button label="*" click={this.setOperations} operation={true}>
+          <FaTimes size={18} />
+        </Button>
+        <Button label="4" click={this.addDigits} />
+        <Button label="5" click={this.addDigits} />
+        <Button label="6" click={this.addDigits} />
+        <Button label="-" click={this.setOperations} operation={true}>
+          <FaMinus size={18} />
+        </Button>
+        <Button label="1" click={this.addDigits} />
+        <Button label="2" click={this.addDigits} />
+        <Button label="3" click={this.addDigits} />
+        <Button label="+" operation={true} click={this.setOperations}>
+          <FaPlus size={18} />
+        </Button>
+        <Button label="0" click={this.addDigits} />
+        <Button label="." click={this.addDigits} />
         <Button
-         label={ <FaPercent size={14} /> }  
-         click={this.setOperations }
-        />
-
-        <Button
-         label={ <FaDivide size={18}  /> } 
-         click={this.setOperations }
-         operation={true} 
-        />
-
-        <Button
-         label="7" 
-         click={this.addDigits }
-        />
-
-        <Button
-         label="8" 
-         click={this.addDigits }
-        />
-
-        <Button
-         label="9" 
-         click={this.addDigits }
-        />
-
-        <Button
-         label={ <FaTimes size={18}  /> }
-         click={this.setOperations }
-         operation={true} 
-        />
-
-        <Button
-         label="4" 
-         click={this.addDigits }
-        />
-
-        <Button
-         label="5" 
-         click={this.addDigits }
-        />
-
-        <Button
-         label="6" 
-         click={this.addDigits }
-        />
-
-        <Button
-         label={ <FaMinus size={18}  /> } 
-         click={this.setOperations }
-         operation={true} 
-        />
-
-        <Button
-         label="1" 
-         click={this.addDigits }
-        />
-
-        <Button
-         label="2" 
-         click={this.addDigits }
-        />
-
-        <Button
-         label="3" 
-         click={this.addDigits }
-        />
-
-        <Button
-         label={ <FaPlus size={18}  /> } 
-         operation={true} 
-         click={this.setOperations }
-        />
-
-        <Button
-         label="0"      
-         click={this.addDigits }
-        /> 
-
-        <Button
-         label="." 
-         click={this.addDigits }
-        />
-
-        <Button 
-          label={ <FaEquals size={18} /> }  
-          double={true} 
+          label="="
+          double={true}
           operation={true}
-          click={this.setOperations }
-        />
-
+          click={this.setOperations}
+        >
+          <FaEquals size={18} />
+        </Button>
       </div>
     )
   }
