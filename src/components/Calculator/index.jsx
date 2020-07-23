@@ -149,6 +149,7 @@ export default class Calculator extends Component {
       if (operation === '=') {
         // Recebe o valor resultado da operação
         const valueResult = operationCalc['=']()
+        if (!valueResult) return
         this.setState({
           ...initialState,
           clearDisplay: true,
