@@ -1,5 +1,11 @@
 # CalculadoraReact
 
+![Project name Shield](https://img.shields.io/badge/Philipe%20Vieira-Calculadora%20React-orange)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/philipe-vieira/CalculadoraReact?color=yellow)
+![License](https://img.shields.io/github/license/philipe-vieira/CalculadoraReact)
+![website shield](https://img.shields.io/website?down_color=orange&down_message=offline&up_message=online&url=https%3A%2F%2Fcalculadorareactphilipe.herokuapp.com%2F)
+![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/philipe-vieira/CalculadoraReact?include_prereleases)
+
 > _This project was created based on the [Calculator](https://github.com/cod3rcursos/curso-react-redux/tree/master/novos-projetos/calculadora) Project developed in the React + Redux course of **[Cod3r - Cursos Online de Tecnologia](https://www.cod3r.com.br/)**. But with **several changes** and **improvements** in functionalities._
 
 CalculadoraReact is an application developed only with the ReactJS library. Created in order to practice and learn about frontend development with the library.
